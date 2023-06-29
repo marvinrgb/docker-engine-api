@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info: 
+  title: Docker Engine API
+  description: Custom APi on top of the Docker Engine API for more Usability and easy creation of a Docker-Frontend
+  version: 0.1.0
+
+paths:
+  /containers:
+    get:
+      tags:
+        - container
+      summary: List Containers
+      description: Lists all existing containers.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/container'
+                  
+                
+
+
+
+
+components:
+  schemas:
+    'container':
+      type: object
+      properties:
+        id:
+          type: string
+          description: Container ID from Docker
+          example: 29fcf26dcb7ae18f7a0712b4f71c3be7da74d5e9d869ee90f312e9f191796714
+        image:
+          type: string
+          description: Image name from Docker. Will match image_id if Docker has no specified name.
+          example: grafana/grafana
+        image_id:
+          type: string
+          description: Image ID from Docker
+          example: sha256:a7f75473a19f1213968a6637e871450c1d0facf6543904416e82d63a16868047
+        created:
+          type: number
+          description: UNIX Timestamp for the creation date of the Docker Container
+          example: 1683614182
+        status:
+          type: string
+          description: Status text from Docker
+          example: Exited (1) 8 days ago
+        ports:
+          type: object
+          properties:
+            IP:
+              type: string
+              description: IP used for port mapping. Will most of the time be 0.0.0.0 or 127.0.0.1
+              example: 0.0.0.0
+            PrivatePort:
+              type: number
+              description: Port from inside the container that is being mapped.
+              example: 3000
+            PublicPort:
+              type: number
+              description: Host port that is mapped to the internal container port and accessible from outside.
+              example: 3000
+            Type:
+              type: string
+              description: Type/Protocol of the mapped port.
+              example: tcp

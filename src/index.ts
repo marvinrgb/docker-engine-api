@@ -46,7 +46,7 @@ app.get('/container/:id', async (req:Request, res:Response) => {
     let cpuDelta = c.cpu_stats.cpu_usage.total_usage - c.precpu_stats.cpu_usage.total_usage;
     let systemDelta = c.cpu_stats.system_cpu_usage - c.precpu_stats.system_cpu_usage;
     let result = cpuDelta / systemDelta * c.cpu_stats.cpu_usage.percpu_usage.length * 100;
-    console.log(c.precpu_stats)
+    // console.log(c.precpu_stats)
     s.cpu = {
       'percentage' : result
     }
@@ -84,7 +84,21 @@ app.get('/containers', async (req:Request, res:Response) => {
   res.json(containers);
 })
 
+app.post('/start/:id', async (req:Request, res:Response) => {
+  const url:string = `http://localhost:2375/containers/${req.params.id}/start`;
+  const response:AxiosResponse = await axios.post(url);
 
+  const data = response.data;
+  res.send(data);
+})
+
+app.post('/stop/:id', async (req:Request, res:Response) => {
+  const url:string = `http://localhost:2375/containers/${req.params.id}/stop`;
+  const response:AxiosResponse = await axios.post(url);
+
+  const data = response.data;
+  res.send(data);
+})
 
 const config:AxiosRequestConfig = {
 
