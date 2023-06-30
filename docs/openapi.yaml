@@ -20,7 +20,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/container'
-                  
+  /container:
+    get:
+      tags:
+        - container
+      summary: Show container info
+      description: Show info and resource stats about a containers.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Container ID from Docker
+          example: 29fcf26dcb7ae18f7a0712b4f71c3be7da74d5e9d869ee90f312e9f191796714
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/container_stats'
+        
                 
 
 
@@ -28,6 +49,114 @@ paths:
 
 components:
   schemas:
+    'container_stats':
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the container
+          example: grafana/grafana
+        id:
+          type: string
+          description: Container ID from Docker
+          example: 9f73cc373cd69fdb891d339fadf0a662d4937a131b962853b942cedcc519413c
+        created:
+          type: string
+          description: Creation date of container. YYYY-MM-DDTHH":"MM":"SS.MSMSMSMSZ
+          example: "2023-05-09T06:36:22.949537039Z"
+        state:
+          type: object
+          properties:
+            Status:
+              type: string
+              description: Container status from Docker
+              example: running
+            Running:
+              type: boolean
+              description: True if container is running
+              example: true
+            Paused:
+              type: boolean
+              description: True if container is paused
+              example: false
+            Restarting:
+              type: boolean
+              description: True if container is restarting
+              example: false
+            OOMKilled:
+              type: boolean
+              description: True if container was killed due to an OOM Condition (Out of Memory)
+              example: false
+            Dead:
+              type: boolean
+              description: True if container is dead (stopped due to completion, an error or manual stop)
+              example: false
+            Pid:
+              type: number
+              description: Process ID of the container
+              example: 4016
+            ExitCode:
+              type: number
+              description: ExitCode from Docker
+              example: 0 
+            Error:
+              type: string
+              description: Error message if container stopped due to an error
+              example: ""
+            StartedAt:
+              type: string
+              description: Last starting date of container
+              example: "2023-05-09T06:36:22.949537039Z"
+            FinishedAt:
+              type: string
+              description: Last stopping date of container
+              example: "2023-05-09T06:36:22.949537039Z"
+        imageName:
+          type: string
+          description: Name of the image. Will match imageId if image has no name.
+          example: mysql
+        imageId:
+          type: string
+          description: Image ID from Docker
+          example: sha256:a7f75473a19f1213968a6637e871450c1d0facf6543904416e82d63a16868047
+        restartCount:
+          type: number
+          description: Amount of restarts since creation of the container
+          example: 0
+        env:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+              description: Displays Environmentvariables in Arrays with each a Key-Value-Pair
+            example: [MYSQL_USER, testuser]
+        stats:
+          type: object
+          properties: 
+            memory:
+              type: object
+              properties:
+                percentage:
+                  type: number
+                  description: Percentage of system RAM that is used by this container. Will be null if calcutlation was unsuccessful.
+                  example: 3.26
+                used:
+                  type: number
+                  description: Used RAM by container in MB. Will be null if calcutlation was unsuccessful.
+                  example: 535.66
+                max:
+                  type: number
+                  description: Maximum RAM available to the container in MB. Will use system RAM if not specified.
+                  example: 16456.15
+            cpu:
+              type: object
+              properties:
+                percentage:
+                  type: number
+                  description: Percentage of system CPU that is used by this container. Will be null if calcutlation was unsuccessful.
+
+
     'container':
       type: object
       properties:
