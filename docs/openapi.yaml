@@ -5,6 +5,82 @@ info:
   version: 0.1.0
 
 paths:
+  /image/check_hub:
+    get:
+      tags:
+        - image
+      summary: Check if image exists on Docker Hub
+      description: Checks if image exists on Docker Hub and return search results if no image matches query.
+      parameters:
+        - in: path
+          name: image_name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: No match on Docker Hub
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties: 
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    pull_count:
+                      type: number
+                    star_count:
+                      type: number
+                    is_trusted:
+                      type: boolean
+                    is_automated:
+                      type: boolean
+                    is_official:
+                      type: boolean
+  /start:
+    post:
+      tags:
+        - container
+      summary: Start container
+      description: Start an existing container.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Container Not Found
+        '500':
+          description: Internal Server Error
+  /stop:
+    post:
+      tags:
+        - container
+      summary: Stop container
+      description: Stop an existing container.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Container Not Found
+        '500':
+          description: Internal Server Error
   /containers:
     get:
       tags:

@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import envsToObject from './functions/envStringsToObject';
+import * as types from './types';
 const app:Application = express();
 const PORT:number = 3000
 
@@ -99,6 +100,18 @@ app.post('/stop/:id', async (req:Request, res:Response) => {
   const data = response.data;
   res.send(data);
 })
+
+app.get('/image/check_hub/:image_name', async (req:Request, res:Response) => {
+  const response = await axios.get(`https://registry.hub.docker.com/v1/search?q=${req.params.image_name}&type=image`);
+  let data:types.DockerHubSearchResponse = response.data;
+  if (data.results.find((v) => v.name === req.params.image_name)) {
+    res.status(200).send();
+  } else {
+    res.status(404).send(data.results);
+  }
+})
+
+
 
 const config:AxiosRequestConfig = {
 
