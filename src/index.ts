@@ -7,6 +7,8 @@ import container from './routes/container';
 import containers from './routes/containers';
 import image from './routes/image';
 
+app.use(express.json())
+
 app.use('/container', container);
 app.use('/containers', containers);
 app.use('/image', image);

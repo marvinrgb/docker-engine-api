@@ -14,3 +14,12 @@ export type DockerHubSearchResponse = {
     is_official: boolean
   }>
 }
+
+export type CreateContainerProps = {
+  name: string,
+  image: string,
+  ports: Array<{
+    host: number,
+    container: number
+  }>
+}

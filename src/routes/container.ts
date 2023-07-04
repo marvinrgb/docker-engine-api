@@ -1,8 +1,57 @@
 import axios, { AxiosResponse } from 'axios';
-import envsToObject from '../functions/envStringsToObject';
+import envsToObject from '../helper/envStringsToObject';
 import { CustomError } from '../errorClass';
 import { Router, Request, Response, NextFunction } from "express";
+import { validate } from '../helper/validate';
+import * as schemas from '../helper/schemas';
+import * as types from '../helper/types';
 const router = Router();
+
+router.post('/create', async (req:Request, res:Response, next:NextFunction) => {
+  let body:types.CreateContainerProps;
+  try {
+    body = req.body;
+    validate(body, schemas.createContainerProps);
+  } catch (error:any) {
+    let err = new CustomError(error.msg, "Invalid Payload Data", 400);
+    return next(err);
+  }
+
+  let requestBody:any = {
+    ExposedPorts: {},
+    Image: body.image,
+    HostConfig: {
+      PortBindings: {}
+    }
+  }
+
+  const ports = body.ports;
+
+  ports.forEach((port) => {
+    requestBody.ExposedPorts[`${port.container}/tcp`] = {};
+    requestBody.HostConfig.PortBindings[`${port.container}/tcp`] = [{ "HostPort": `${port.host}` }];
+  })
+
+  let docker_response;
+  try {
+    docker_response = await axios.post(
+      `http://localhost:2375/containers/create?name=${body.name}`,
+      JSON.stringify(requestBody),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    res.send(docker_response.data);
+  } catch (error:any) {
+    console.log(error.response)
+    let err = new CustomError(error.message, "request to docker hub or processing of response failed", 500)
+    return next(err);    
+  }
+
+})
+
 
 
 router.get('/:id', async (req:Request, res:Response, next:NextFunction) => {
@@ -60,7 +109,7 @@ router.get('/:id', async (req:Request, res:Response, next:NextFunction) => {
     
   } catch (error:any) {
     let err = new CustomError(error.message, "request to docker engine or processing of response failed. check if the docker engine is running", 500)    
-    next(err);
+    return next(err);
   }
 
 })
@@ -85,7 +134,7 @@ router.post('/start/:id', async (req:Request, res:Response, next:NextFunction) =
   } catch (error:any) {
     console.log(error);
     let err = new CustomError(error.message, "request to docker hub or processing of response failed", 500);
-    next(err);
+    return next(err);
   }
 
   res.send(data);
@@ -111,7 +160,7 @@ router.post('/stop/:id', async (req:Request, res:Response, next:NextFunction) =>
   } catch (error:any) {
     console.log(error);
     let err = new CustomError(error.message, "request to docker hub or processing of response failed", 500);
-    next(err);
+    return next(err);
   }
 
   res.send(data);

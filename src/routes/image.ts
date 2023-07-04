@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { Router, Request, Response, NextFunction } from "express";
-import * as types from '../types';
+import * as types from '../helper/types';
 import { CustomError } from '../errorClass';
 const router = Router();
 
@@ -20,7 +20,7 @@ router.get('/check_hub/:image_name', async (req:Request, res:Response, next:Next
     }
   } catch (error:any) {
     let err = new CustomError(error.message, "request to docker hub or processing of response failed", 500)
-    next(err);
+    return next(err);
   }
 })
 
