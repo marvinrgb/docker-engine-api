@@ -43,7 +43,7 @@ paths:
                       type: boolean
                     is_official:
                       type: boolean
-  /start:
+  /container/start:
     post:
       tags:
         - container
@@ -62,7 +62,7 @@ paths:
           description: Container Not Found
         '500':
           description: Internal Server Error
-  /stop:
+  /container/stop:
     post:
       tags:
         - container
