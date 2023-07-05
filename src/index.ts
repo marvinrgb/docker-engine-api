@@ -6,12 +6,14 @@ const PORT:number = 3000
 import container from './routes/container';
 import containers from './routes/containers';
 import image from './routes/image';
+import images from './routes/images';
 
 app.use(express.json())
 
 app.use('/container', container);
 app.use('/containers', containers);
 app.use('/image', image);
+app.use('/images', images);
 
 
 

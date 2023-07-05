@@ -1,10 +1,124 @@
 openapi: 3.0.3
 info: 
   title: Docker Engine API
-  description: Custom APi on top of the Docker Engine API for more Usability and easy creation of a Docker-Frontend
+  description: Custom API on top of the Docker Engine API for more Usability and easy creation of a Docker-Frontend
   version: 0.1.0
 
 paths:
+  /container/create:
+    post:
+      tags:
+        - container
+      summary: Create a container
+      description: Create a new container with the specified properties. Will not automatically start the container.
+      requestBody:
+        description: Properies for the container that is to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - image
+              properties: 
+                image:
+                  type: string
+                  description: Name and optionally tag of the image for the container
+                  example: mysql
+                name:
+                  type: string
+                  description: Name for the container
+                  example: some-mysql
+                ports:
+                  type: array
+                  items:
+                    type: object
+                    properties: 
+                      host:
+                        type: number
+                        description: Port of the host that should point to the specified container port
+                        example: 3306
+                      container:
+                        type: number
+                        description: Port of the container that will be accessible from the specified host port
+                        example: 3306
+
+      responses:
+        '200':
+          description: Container created
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  Id:
+                    type: string
+                    description: ID that the created container was given
+                    example: 737676082ef07a2b1d7697e942be4be217b64dff47f31ab4ee473fa3465dfbe8
+                  Warnings: 
+                    type: array
+                    items:
+                      type: string
+                      description: Warning from docker concerning the created container
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Error Message
+                example: Invalid Payload Data
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
+
+  /images:
+    get:
+      tags:
+        - image
+      summary: List images
+      description: List all downloaded images.
+      responses:
+        '200':
+          description: Returns an array of image objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Image id
+                      example: sha256:a7f75473a19f1213968a6637e871450c1d0facf6543904416e82d63a16868047
+                    created:
+                      type: number
+                      description: UNIX Timestamp of image creation
+                      example: 1687330011
+                    size:
+                      type: number
+                      description: Image size in Bytes
+                      example: 329173041
+                    name:
+                      type: string
+                      description: Image name or image repository name
+                      example: grafana/grafana
+                    tag:
+                      type: string
+                      description: Tag of this image version. Can be a number or something like latest
+                      example: "18.0.2"
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
   /image/check_hub:
     get:
       tags:
@@ -43,6 +157,13 @@ paths:
                       type: boolean
                     is_official:
                       type: boolean
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
   /container/start:
     post:
       tags:
@@ -58,10 +179,17 @@ paths:
       responses:
         '200':
           description: Success
+        '400':
+          description: container already running
         '404':
-          description: Container Not Found
+          description: container not found
         '500':
           description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
   /container/stop:
     post:
       tags:
@@ -77,10 +205,17 @@ paths:
       responses:
         '200':
           description: Success
+        '400':
+          description: container not running
         '404':
-          description: Container Not Found
+          description: container not found
         '500':
           description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
   /containers:
     get:
       tags:
@@ -96,6 +231,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/container'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
   /container:
     get:
       tags:
@@ -117,6 +259,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/container_stats'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
         
                 
 
@@ -231,8 +380,6 @@ components:
                 percentage:
                   type: number
                   description: Percentage of system CPU that is used by this container. Will be null if calcutlation was unsuccessful.
-
-
     'container':
       type: object
       properties:

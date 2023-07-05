@@ -30,7 +30,7 @@ router.get('/containers', async (req:Request, res:Response, next:NextFunction) =
     res.json(containers);
   } catch (error:any) {
     let err = new CustomError(error.message, "request to docker hub or processing of response failed", 500)
-    next(err);
+    return next(err);
   }
 })
 

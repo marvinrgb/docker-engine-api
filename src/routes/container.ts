@@ -35,7 +35,7 @@ router.post('/create', async (req:Request, res:Response, next:NextFunction) => {
   let docker_response;
   try {
     docker_response = await axios.post(
-      `http://localhost:2375/containers/create?name=${body.name}`,
+      `http://localhost:2375/containers/create?name=${body.name || `unnamed-${body.image}`}`,
       JSON.stringify(requestBody),
       {
         headers: {
@@ -123,13 +123,15 @@ router.post('/start/:id', async (req:Request, res:Response, next:NextFunction) =
     try {
       response = await axios.post(url);
     } catch (error:any) {
+      console.log(error.response.status)
       if (error.response.status === 304) {
         return res.status(400).send('container already running');
+      } else if (error.response.status === 404) {
+        return res.status(404).send('container not found');
       } else {
         throw new Error(error.message)
       }
     }
-    console.log(response.status)
     data = response.data;
   } catch (error:any) {
     console.log(error);
@@ -149,13 +151,15 @@ router.post('/stop/:id', async (req:Request, res:Response, next:NextFunction) =>
     try {
       response = await axios.post(url);
     } catch (error:any) {
+      console.log(error.response.status)
       if (error.response.status === 304) {
         return res.status(400).send('container not running');
+      } else if (error.response.status === 404) {
+        return res.status(404).send('container not found');
       } else {
         throw new Error(error.message)
       }
     }
-    console.log(response.status)
     data = response.data;
   } catch (error:any) {
     console.log(error);
