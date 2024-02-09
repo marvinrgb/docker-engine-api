@@ -1,0 +1,2 @@
+build image mit parameter .zip datei 
+(ordner mit Dockerfile, ansonsten dockerfile generator)

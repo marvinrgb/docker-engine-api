@@ -23,3 +23,7 @@ export type CreateContainerProps = {
     container: number
   }>
 }
+
+export type createContainerRequestBody = {
+  
+}

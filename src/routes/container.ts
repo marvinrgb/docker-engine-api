@@ -25,7 +25,7 @@ router.post('/create', async (req:Request, res:Response, next:NextFunction) => {
     }
   }
 
-  const ports = body.ports;
+  const ports:Array<{host:number, container:number}> = body.ports;
 
   ports.forEach((port) => {
     requestBody.ExposedPorts[`${port.container}/tcp`] = {};

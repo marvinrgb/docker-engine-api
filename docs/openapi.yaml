@@ -5,10 +5,120 @@ info:
   version: 0.1.0
 
 paths:
+  /swarm:
+    post:
+      tags:
+        - Swarm
+      summary: Create a new Swarm
+      requestBody:
+        description: Properties for the new Swarm
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config:
+                  type: object
+                  properties:
+                    ListenAddr:
+                      type: string
+                      example: 0.0.0.0:2377
+                    AdvertiseAddr: 
+                      type: string
+                      example: 192.168.1.1:2377
+                    DataPathPort:
+                      type: number
+                      example: 4789
+                    DefaultAddrPool:
+                      type: array
+                      items:
+                        type: string
+                      example: ["10.10.0.0/8", "20.20.0.0/8"]
+                    SubnetSize:
+                      type: number
+                      example: 24
+                    ForceNewCluster:
+                      type: boolean
+                      example: false
+                    Spec: 
+                      type: object
+                      properties:
+                        Name:
+                          type: string
+                          description: Name of the Swarm
+                        Labels:
+                          type: object
+                          description: User-defined key/value metadata
+                        Orchestration:
+                          type: object
+                          properties:
+                            TaskHistoryRetentionLimit:
+                              type: number
+                              description: The number of historic tasks to keep per instance or node. If negative, never remove completed or failed tasks.
+                        Raft:
+                          type: object
+                          description: Raft configuration
+                        Dispatcher:
+                          type: object
+                          description: Dispatcher configuration
+                        CAConfig:
+                          type: object
+                          description: CA configuration
+                        EncryptConfig:
+                          type: object
+                          description: Parameteres related to encryption-at-rest
+                        TaskDefaults:
+                          type: object
+                          description: Defaults for creating tasks in this cluster
+      responses:
+        '201':
+          description: Swarm created
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: request to docker or processing of response failed
+    get:
+      tags:
+        - Swarm
+      summary: Inspect Swarm
+      responses:
+        '200':
+          description: Swarm information & configuration data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: too lazy, look at the post request (+ JoinTokens)
+  /services:
+    get:
+      tags:
+        - Swarm
+      summary: List services
+      parameters:
+        - in: query
+          name: filters
+          schema:
+            type: string
+            description: A JSON encoded value of the filters (a map[string][]string) to process on the services list.
+      responses:
+        '200':
+          description: Information about all services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  
+  
   /container/create:
     post:
       tags:
-        - container
+        - Container
       summary: Create a container
       description: Create a new container with the specified properties. Will not automatically start the container.
       requestBody:
@@ -79,9 +189,9 @@ paths:
   /images:
     get:
       tags:
-        - image
+        - Image
       summary: List images
-      description: List all downloaded images.
+      description: List all built and downloaded images.
       responses:
         '200':
           description: Returns an array of image objects
@@ -122,7 +232,7 @@ paths:
   /image/check_hub:
     get:
       tags:
-        - image
+        - Image
       summary: Check if image exists on Docker Hub
       description: Checks if image exists on Docker Hub and return search results if no image matches query.
       parameters:
@@ -167,7 +277,7 @@ paths:
   /container/start:
     post:
       tags:
-        - container
+        - Container
       summary: Start container
       description: Start an existing container.
       parameters:
@@ -193,7 +303,7 @@ paths:
   /container/stop:
     post:
       tags:
-        - container
+        - Container
       summary: Stop container
       description: Stop an existing container.
       parameters:
@@ -219,7 +329,7 @@ paths:
   /containers:
     get:
       tags:
-        - container
+        - Container
       summary: List Containers
       description: Lists all existing containers.
       responses:
@@ -241,7 +351,7 @@ paths:
   /container:
     get:
       tags:
-        - container
+        - Container
       summary: Show container info
       description: Show info and resource stats about a containers.
       parameters:

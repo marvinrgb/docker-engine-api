@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import { CustomError } from './errorClass'
 const app:Application = express();
 const PORT:number = 3000
@@ -19,7 +19,7 @@ app.use('/images', images);
 
 
 
-app.use((err:any, req:Request, res:Response, next:NextFunction) => {
+app.use((err:any, req:Request, res:Response) => {
   if (!(err instanceof CustomError)) {
     err.time = Date.now();
     console.log(err);
